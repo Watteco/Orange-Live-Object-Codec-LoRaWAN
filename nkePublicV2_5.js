@@ -2,6 +2,7 @@
  * Decoder for all NKE Watteco sensors
  *   v1.0 (public)  : From THIEBAUD Claudine TGI/OLS
  *   V2.4 (public)  : 27-09-2021 - C.THIEBAUD (OLS) - ajouts tags profile, ajout clusters 8008 800C 4006 0403, decodage commande 8A
+ *   V2.5 (pulblic) :  Mathieu Pouillot (Watteco) - ajouts tags profile, ajouts cluters 800A 800B
  */
 
 function Fixfield(encoded, digitstart, digitend, name) {
@@ -64,6 +65,8 @@ var mapCluster = {
 	'8007' : 'Serial Master/Slave Protocol',
 	'8008' : 'Differential Pressure Measurement',
 	'8009' : 'Multi Master/Slave answers',
+	'800A' : 'Energy and Power Metering',
+	'800B' : 'Voltage and Current Metering',
 	'800C' : 'Concentration Measurement',
 	'8052' : 'Power Quality'
 };
@@ -236,6 +239,14 @@ var mapOccupancyAttributId = {
 		'0001' : 'Occupancy Type'		
 };
 
+var mapEnergyPowerMeteringAttributId = {
+	'0000' : 'Measured values'
+};
+
+var mapVoltageCurrentMeteringAttributId = {
+	'0000' : 'Measured values'
+};
+
 var mapCurrentPowerMode = {
 	'00' : 'ON when idle',
 	'01' : 'Periodically ON',
@@ -384,6 +395,14 @@ function decodeStandard(encoded,dataMessage) {
 	case '8009':
 		mapAttributId = mapMultiMasterSlaveAnswersAttributId;
 		decodeFunction = decodeMultiMasterSlaveAnswersCluster;
+		break;	
+	case '800A':
+		mapAttributId = mapEnergyPowerMeteringAttributId;
+		decodeFunction = decodeEnergyPowerMeteringCluster;
+		break;	
+	case '800B':
+		mapAttributId = mapVoltageCurrentMeteringAttributId;
+		decodeFunction = decodeVoltageCurrentMeteringCluster;
 		break;	
 	case '800C':
 		mapAttributId = mapConcentrationMeasurementAttributId;
@@ -1255,6 +1274,124 @@ function decodeStandard(encoded,dataMessage) {
 			data.reactivePowerDivisor = Number(data.reactive_power_divisor);
 			delete data.reactive_power_divisor;
 
+			break;
+		}
+		return (data);
+	}
+
+	function decodeVoltageCurrentMeteringCluster(encoded) {
+		var data;
+		var decoded;
+		switch (attributId.hexavalue) {
+		case '0000':
+			var Vrms;
+			var Irms;
+			var PhaseAngleVtoI;
+			if (attributType.hexavalue != '41') {
+				return "{\"error\":\"wrong attributType\"}";
+			}
+			
+			framedsl += ' ubyte data_length;'
+					+ 'short Vrms_measured; '
+					+ 'short Irms_measured; '
+					+ 'short Angle_measured; ';
+			try {
+				decoded = BinaryDecoder.decode(framedsl, encoded);
+				data = JSON.parse(decoded);
+			} catch (e) {
+				return "{\"error\":\"decoding failed\"}";
+			}
+			data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue,mapAttributId);
+			delete data.data_length;
+			data.Vrms = {};
+			data.Vrms.value = Number(data.Vrms_measured);
+			data.Vrms.unit = 'V';
+			delete data.Vrms_measured;
+			data.Irms = {};
+			data.Irms.value = Number(data.Irms_measured);
+			data.Irms.unit = 'A';
+			delete data.Irms_measured;
+
+			data.AngleVtoI = {};
+			data.AngleVtoI.value = Number(data.Angle_measured);
+			data.AngleVtoI.unit = '°';
+			delete data.Angle_measured;
+			break;
+		}
+		return (data);
+	}
+
+	function decodeEnergyPowerMeteringCluster(encoded) {
+		var data;
+		var decoded;
+		switch (attributId.hexavalue) {
+		case '0000':
+			var SumPosActEnergy;
+			var SumNegActEnergy;
+			var SumPosReactEnergy;
+			var SumNegReactEnergy;
+			var PosActPow;
+			var NegActPow;
+			var PosReactPow;
+			var NegReactPow;
+
+			framedsl += ' ubyte data_length;'
+					+ 'ubyte[4] SumPosActEnergy_measured; '
+					+ 'ubyte[4] SumNegActEnergy_measured; '
+					+ 'ubyte[4] SumPosReactEnergy_measured; '
+					+ 'ubyte[4] SumNegReactEnergy_measured; '
+					+ 'ubyte[4] PosActPow_measured; '
+					+ 'ubyte[4] NegActPow_measured; '
+					+ 'ubyte[4] PosReactPow_measured; '
+					+ 'ubyte[4] NegReactPow_measured; ';
+			try {
+				decoded = BinaryDecoder.decode(framedsl, encoded);
+				data = JSON.parse(decoded);
+			} catch (e) {
+				return "{\"error\":\"decoding failed\"}";
+			}
+			data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue,mapAttributId);
+			delete data.data_length;
+			data.SumPosActEnergy = {};
+			data.SumPosActEnergy.value = calculateType23FromDslTab4Ubytes(data.SumPosActEnergy_measured);
+			data.SumPosActEnergy.unit = 'Wh/kWh';
+			delete data.SumPosActEnergy_measured;
+
+			data.SumNegActEnergy = {};
+			data.SumNegActEnergy.value = calculateType23FromDslTab4Ubytes(data.SumNegActEnergy_measured);
+			data.SumNegActEnergy.unit = 'Wh/kWh';
+			delete data.SumNegActEnergy_measured;
+			
+			data.SumPosReactEnergy = {};
+			data.SumPosReactEnergy.value = calculateType23FromDslTab4Ubytes(data.SumPosReactEnergy_measured);
+			data.SumPosReactEnergy.unit = 'VARh/kVARh';
+			delete data.SumPosReactEnergy_measured;
+			
+			data.SumNegReactEnergy = {};
+			data.SumNegReactEnergy.value = calculateType23FromDslTab4Ubytes(data.SumNegReactEnergy_measured);
+			data.SumNegReactEnergy.unit = 'VARh/kVARh';
+			delete data.SumNegReactEnergy_measured;
+			
+			data.PosActPow = {};
+			data.PosActPow.value = calculateType23FromDslTab4Ubytes(data.PosActPow_measured);
+			data.PosActPow.unit = 'W';
+			delete data.PosActPow_measured;
+			
+			data.NegActPow = {};
+			data.NegActPow.value = calculateType23FromDslTab4Ubytes(data.NegActPow_measured);
+			data.NegActPow.unit = 'W';
+			delete data.NegActPow_measured;
+			
+			data.PosReactPow = {};
+			data.PosReactPow.value = calculateType23FromDslTab4Ubytes(data.PosReactPow_measured);
+			data.PosReactPow.unit = 'VAR';
+			delete data.PosReactPow_measured;
+
+			data.NegReactPow = {};
+			data.NegReactPow.value = calculateType23FromDslTab4Ubytes(data.NegReactPow_measured);
+			data.NegReactPow.unit = 'VAR';
+			delete data.NegReactPow_measured;
+			
 			break;
 		}
 		return (data);
