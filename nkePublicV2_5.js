@@ -2,7 +2,7 @@
  * Decoder for all NKE Watteco sensors
  *   v1.0 (public)  : From THIEBAUD Claudine TGI/OLS
  *   V2.4 (public)  : 27-09-2021 - C.THIEBAUD (OLS) - ajouts tags profile, ajout clusters 8008 800C 4006 0403, decodage commande 8A
- *   V2.5 (pulblic) :  Mathieu Pouillot (Watteco) - ajouts tags profile, ajouts cluters 800A 800B
+ *   V2.5_dev (private)	:	25.05.2022 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO)
  */
 
 function Fixfield(encoded, digitstart, digitend, name) {
@@ -1284,9 +1284,9 @@ function decodeStandard(encoded,dataMessage) {
 		var decoded;
 		switch (attributId.hexavalue) {
 		case '0000':
-			var Vrms;
-			var Irms;
-			var PhaseAngleVtoI;
+			var vrms;
+			var irms;
+			var angle;
 			if (attributType.hexavalue != '41') {
 				return "{\"error\":\"wrong attributType\"}";
 			}
@@ -1303,19 +1303,19 @@ function decodeStandard(encoded,dataMessage) {
 			}
 			data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue,mapAttributId);
 			delete data.data_length;
-			data.Vrms = {};
-			data.Vrms.value = Number(data.Vrms_measured);
-			data.Vrms.unit = 'V';
-			delete data.Vrms_measured;
-			data.Irms = {};
-			data.Irms.value = Number(data.Irms_measured);
-			data.Irms.unit = 'A';
-			delete data.Irms_measured;
+			data.vrms = {};
+			data.vrms.value = Number(data.vrms_measured)/10;
+			data.vrms.unit = 'V';
+			delete data.vrms_measured;
+			data.irms = {};
+			data.irms.value = Number(data.irms_measured)/10;
+			data.irms.unit = 'A';
+			delete data.irms_measured;
 
-			data.AngleVtoI = {};
-			data.AngleVtoI.value = Number(data.Angle_measured);
-			data.AngleVtoI.unit = '°';
-			delete data.Angle_measured;
+			data.angle = {};
+			data.angle.value = Number(data.angle_measured);
+			data.angle.unit = '°';
+			delete data.angle_measured;
 			break;
 		}
 		return (data);
@@ -1353,44 +1353,44 @@ function decodeStandard(encoded,dataMessage) {
 			data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue,mapAttributId);
 			delete data.data_length;
 			data.SumPosActEnergy = {};
-			data.SumPosActEnergy.value = calculateType23FromDslTab4Ubytes(data.SumPosActEnergy_measured);
+			data.SumPosActEnergy.value = calculateType23FromDslTab4Ubytes(data.sumposactenergy_measured);
 			data.SumPosActEnergy.unit = 'Wh/kWh';
-			delete data.SumPosActEnergy_measured;
+			delete data.sumposactenergy_measured;
 
 			data.SumNegActEnergy = {};
-			data.SumNegActEnergy.value = calculateType23FromDslTab4Ubytes(data.SumNegActEnergy_measured);
+			data.SumNegActEnergy.value = calculateType23FromDslTab4Ubytes(data.sumnegactenergy_measured);
 			data.SumNegActEnergy.unit = 'Wh/kWh';
-			delete data.SumNegActEnergy_measured;
+			delete data.sumnegactenergy_measured;
 			
 			data.SumPosReactEnergy = {};
-			data.SumPosReactEnergy.value = calculateType23FromDslTab4Ubytes(data.SumPosReactEnergy_measured);
+			data.SumPosReactEnergy.value = calculateType23FromDslTab4Ubytes(data.sumposreactenergy_measured);
 			data.SumPosReactEnergy.unit = 'VARh/kVARh';
-			delete data.SumPosReactEnergy_measured;
+			delete data.sumposreactenergy_measured;
 			
 			data.SumNegReactEnergy = {};
-			data.SumNegReactEnergy.value = calculateType23FromDslTab4Ubytes(data.SumNegReactEnergy_measured);
+			data.SumNegReactEnergy.value = calculateType23FromDslTab4Ubytes(data.sumnegreactenergy_measured);
 			data.SumNegReactEnergy.unit = 'VARh/kVARh';
-			delete data.SumNegReactEnergy_measured;
+			delete data.sumnegreactenergy_measured;
 			
 			data.PosActPow = {};
-			data.PosActPow.value = calculateType23FromDslTab4Ubytes(data.PosActPow_measured);
+			data.PosActPow.value = calculateType23FromDslTab4Ubytes(data.posactpow_measured);
 			data.PosActPow.unit = 'W';
-			delete data.PosActPow_measured;
+			delete data.posactpow_measured;
 			
 			data.NegActPow = {};
-			data.NegActPow.value = calculateType23FromDslTab4Ubytes(data.NegActPow_measured);
+			data.NegActPow.value = calculateType23FromDslTab4Ubytes(data.negactpow_measured);
 			data.NegActPow.unit = 'W';
-			delete data.NegActPow_measured;
+			delete data.negactpow_measured;
 			
 			data.PosReactPow = {};
-			data.PosReactPow.value = calculateType23FromDslTab4Ubytes(data.PosReactPow_measured);
+			data.PosReactPow.value = calculateType23FromDslTab4Ubytes(data.posreactpow_measured);
 			data.PosReactPow.unit = 'VAR';
-			delete data.PosReactPow_measured;
+			delete data.posreactpow_measured;
 
 			data.NegReactPow = {};
-			data.NegReactPow.value = calculateType23FromDslTab4Ubytes(data.NegReactPow_measured);
+			data.NegReactPow.value = calculateType23FromDslTab4Ubytes(data.negreactpow_measured);
 			data.NegReactPow.unit = 'VAR';
-			delete data.NegReactPow_measured;
+			delete data.negreactpow_measured;
 			
 			break;
 		}
@@ -3741,7 +3741,7 @@ function decodeBatch(encoded, dataMessage) {
 				for (var i=0; i<tagArrayLength;i++){
 					var tag = tagArray[i];				
 					switch (tag) {
-						case 'BATCH_5070074_DEFAULT_PROFILE': // vaqao+
+						case 'BATCH_5070074_DEFAULT_PROFILE': /* vaqao+ */
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_occupancy_NoUnit_L0_R1_T4';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L1_R10_T7_D100';
@@ -3751,14 +3751,14 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_luminosity_lux_L5_R10_T6';
 							tagArray[tagArrayLength++] = 'BATCH_pressure_hPa_L6_R10_T6';
 							break;
-						case 'BATCH_5070043_DEFAULT_PROFILE': //Remote T
-						case 'BATCH_5070126_DEFAULT_PROFILE': //Remote T
+						case 'BATCH_5070043_DEFAULT_PROFILE': /*Remote T */
+						case 'BATCH_5070126_DEFAULT_PROFILE': /*Remote T */
 							tagArray[i] = 'BATCH_tagsize_1';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L1_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
 							break;	
-						case 'BATCH_5070099_DEFAULT_PROFILE': // atmo
+						case 'BATCH_5070099_DEFAULT_PROFILE': /* atmo */
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R1_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_relativeHumidities_%RH_L1_R1_T6_D100';
@@ -3767,7 +3767,7 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_index2_/_L4_R1_T10';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L5_R1_T6';
 							break;	
-						case 'BATCH_5070124_DEFAULT_PROFILE': // torano
+						case 'BATCH_5070124_DEFAULT_PROFILE': /* torano */
 						case 'BATCH_5070150_DEFAULT_PROFILE': 
 							tagArray[i] = 'BATCH_tagsize_4';
 							tagArray[tagArrayLength++] = 'BATCH_index1_/_L0_R1_T10_D1';
@@ -3783,12 +3783,12 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_ratio-2_%_L10_R1_T12_D1000';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L11_R100_T6';
 							break;	
-						case 'BATCH_5070001_DEFAULT_PROFILE': //Pulse S0
+						case 'BATCH_5070001_DEFAULT_PROFILE': /*Pulse S0 */
 							tagArray[i] = 'BATCH_tagsize_1';
 							tagArray[tagArrayLength++] = 'BATCH_index1_/_L0_R1_T10';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
 							break;	
-						case 'BATCH_5070017_DEFAULT_PROFILE': //Presso
+						case 'BATCH_5070017_DEFAULT_PROFILE': /*Presso*/
 						case 'BATCH_5070189_DEFAULT_PROFILE': 
 							tagArray[i] = 'BATCH_tagsize_3'; 
 							tagArray[tagArrayLength++] = 'BATCH_4-20mA_mA_L0_R0.004_T12';
@@ -3797,13 +3797,13 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_ExtPowerLevels_mV_L3_R100_T6';
 							tagArray[tagArrayLength++] = 'BATCH_index1_/_L4_R1_T10';
 							break;
-						case 'BATCH_5070001_DEFAULT_PROFILE': //Flasho
+						case 'BATCH_5070001_DEFAULT_PROFILE': /*Flasho */
 							tagArray[i] = 'BATCH_tagsize_2';
 							tagArray[tagArrayLength++] = 'BATCH_currents_A_L0_R0.1_T12';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
 							tagArray[tagArrayLength++] = '';
 							break;
-						case 'BATCH_5070001_DEFAULT_PROFILE': //Monito
+						case 'BATCH_5070001_DEFAULT_PROFILE': /*Monito*/
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_0-100mV_mV_L0_R0.02_T12';
 							tagArray[tagArrayLength++] = 'BATCH_0-70V_V_L1_R15_T12_D1000';
