@@ -4043,10 +4043,10 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
 							tagArray[tagArrayLength++] = '';
 							break;
-						case 'BATCH_5070001_DEFAULT_PROFILE': /*Monito*/
+						case 'BATCH_5070141_DEFAULT_PROFILE': /*Monito*/
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_0-100mV_mV_L0_R0.02_T12';
-							tagArray[tagArrayLength++] = 'BATCH_0-70V_V_L1_R15_T12_D1000';
+							tagArray[tagArrayLength++] = 'BATCH_0-70V_V_L1_R17_T12_D1000';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L2_R100_T6';
 							break;
 						case 'BATCH_5070053_DEFAULT_PROFILE':
