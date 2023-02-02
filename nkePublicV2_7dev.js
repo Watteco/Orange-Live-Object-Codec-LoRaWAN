@@ -3998,6 +3998,13 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L1_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
 							break;
+						case 'BATCH_5070043_DEFAULT_PROFILE_BATTERY_V': /*Remote T */
+						case 'BATCH_5070126_DEFAULT_PROFILE_BATTERY_V': /*Remote T */
+							tagArray[i] = 'BATCH_tagsize_1';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L1_R10_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L1_R100_T6_D1000';
+							break;
 						case 'BATCH_5070099_DEFAULT_PROFILE': /* atmo */
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R1_T7_D100';
@@ -4006,6 +4013,15 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_index1_/_L3_R1_T10';
 							tagArray[tagArrayLength++] = 'BATCH_index2_/_L4_R1_T10';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L5_R1_T6';
+							break;
+						case 'BATCH_5070099_DEFAULT_PROFILE_BATTERY_V': /* atmo */
+							tagArray[i] = 'BATCH_tagsize_3';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R1_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_relativeHumidities_%RH_L1_R1_T6_D100';
+							tagArray[tagArrayLength++] = 'BATCH_pressure_hPa_L2_R1_T7';
+							tagArray[tagArrayLength++] = 'BATCH_index1_/_L3_R1_T10';
+							tagArray[tagArrayLength++] = 'BATCH_index2_/_L4_R1_T10';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L5_R1_T6_D1000';
 							break;
 						case 'BATCH_5070124_DEFAULT_PROFILE': /* torano */
 						case 'BATCH_5070150_DEFAULT_PROFILE':
@@ -4023,6 +4039,22 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_ratio-2_%_L10_R1_T12_D1000';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L11_R100_T6';
 							break;
+						case 'BATCH_5070124_DEFAULT_PROFILE_BATTERY_V': /* torano */
+						case 'BATCH_5070150_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_4';
+							tagArray[tagArrayLength++] = 'BATCH_index1_/_L0_R1_T10_D1';
+							tagArray[tagArrayLength++] = 'BATCH_index2_/_L1_R1_T10_D1';
+							tagArray[tagArrayLength++] = 'BATCH_index3_/_L2_R1_T10_D1';
+							tagArray[tagArrayLength++] = 'BATCH_state1_/_L3_R1_T1';
+							tagArray[tagArrayLength++] = 'BATCH_state2_/_L4_R1_T1';
+							tagArray[tagArrayLength++] = 'BATCH_state3_/_L5_R1_T1';
+							tagArray[tagArrayLength++] = 'BATCH_4-20mA_mA_L6_R0.004_T12';
+							tagArray[tagArrayLength++] = 'BATCH_0-5V-1_V_L7_R1_T12_D1000';
+							tagArray[tagArrayLength++] = 'BATCH_0-5V-2_V_L8_R1_T12_D1000';
+							tagArray[tagArrayLength++] = 'BATCH_ratio-1_%_L9_R1_T12_D1000';
+							tagArray[tagArrayLength++] = 'BATCH_ratio-2_%_L10_R1_T12_D1000';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L11_R100_T6_D1000';
+							break;
 						case 'BATCH_5070001_DEFAULT_PROFILE': /*Pulse S0 */
 							tagArray[i] = 'BATCH_tagsize_1';
 							tagArray[tagArrayLength++] = 'BATCH_index1_/_L0_R1_T10';
@@ -4037,17 +4069,27 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_ExtPowerLevels_mV_L3_R100_T6';
 							tagArray[tagArrayLength++] = 'BATCH_index1_/_L4_R1_T10';
 							break;
-						case 'BATCH_5070001_DEFAULT_PROFILE': /*Flasho */
-							tagArray[i] = 'BATCH_tagsize_2';
-							tagArray[tagArrayLength++] = 'BATCH_currents_A_L0_R0.1_T12';
+						case 'BATCH_5070071_DEFAULT_PROFILE': /*Flasho */
+							tagArray[i] = 'BATCH_tagsize_1';
+							tagArray[tagArrayLength++] = 'BATCH_index1_/_L0_R1_T10';;
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
-							tagArray[tagArrayLength++] = '';
+							break;
+						case 'BATCH_5070071_DEFAULT_PROFILE_BATTERY_V': /*Flasho */
+							tagArray[i] = 'BATCH_tagsize_1';
+							tagArray[tagArrayLength++] = 'BATCH_index1_/_L0_R1_T10';;
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L1_R100_T6_D1000';
 							break;
 						case 'BATCH_5070141_DEFAULT_PROFILE': /*Monito*/
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_0-100mV_mV_L0_R0.02_T12';
 							tagArray[tagArrayLength++] = 'BATCH_0-70V_V_L1_R17_T12_D1000';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L2_R100_T6';
+							break;
+						case 'BATCH_5070141_DEFAULT_PROFILE_BATTERY_V': /*Monito*/
+							tagArray[i] = 'BATCH_tagsize_3';
+							tagArray[tagArrayLength++] = 'BATCH_0-100mV_mV_L0_R0.02_T12';
+							tagArray[tagArrayLength++] = 'BATCH_0-70V_V_L1_R17_T12_D1000';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L2_R100_T6_D1000';
 							break;
 						case 'BATCH_5070053_DEFAULT_PROFILE':
 						case 'BATCH_5070191_DEFAULT_PROFILE':
@@ -4059,11 +4101,28 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L2_R1_T6';
 							tagArray[tagArrayLength++] = 'BATCH_openCaseAlarms_NoUnit_L3_R1_T1';
 							break;
+						case 'BATCH_5070053_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070191_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070162_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070200_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_2';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_relativeHumidities_%RH_L1_R100_T6_D100';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L2_R1_T6_D1000';
+							tagArray[tagArrayLength++] = 'BATCH_openCaseAlarms_NoUnit_L3_R1_T1';
+							break;
 						case 'BATCH_5070085_DEFAULT_PROFILE':
 						case 'BATCH_5070167_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_2';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L2_R1_T6';
+							tagArray[tagArrayLength++] = 'BATCH_openCaseAlarms_NoUnit_L3_R1_T1';
+							break;
+						case 'BATCH_5070085_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070167_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_2';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L2_R1_T6_D1000';
 							tagArray[tagArrayLength++] = 'BATCH_openCaseAlarms_NoUnit_L3_R1_T1';
 							break;
 						case 'BATCH_5070123_DEFAULT_PROFILE':
@@ -4077,16 +4136,38 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_index3_/_L2_R1_T10_D1';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L6_R100_T6';
 							break;
+						case 'BATCH_5070123_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070152_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070160_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070161_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070039_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_4';
+							tagArray[tagArrayLength++] = 'BATCH_index1_/_L0_R1_T10_D1';
+							tagArray[tagArrayLength++] = 'BATCH_index2_/_L1_R1_T10_D1';
+							tagArray[tagArrayLength++] = 'BATCH_index3_/_L2_R1_T10_D1';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L6_R100_T6_D1000';
+							break;
 						case 'BATCH_5070163_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures-1_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures-2_°C_L1_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L5_R100_T6';
 							break;
+						case 'BATCH_5070163_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_3';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures-1_°C_L0_R10_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures-2_°C_L1_R10_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L5_R100_T6_D1000';
+							break;
 						case 'BATCH_5070164_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_3';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L5_R100_T6';
+							break;
+						case 'BATCH_5070164_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_3';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L5_R100_T6_D1000';
 							break;
 						case 'BATCH_5070168_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_3';
@@ -4100,6 +4181,11 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_openClose_NoUnit_L0_R1_T1';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
 							break;
+						case 'BATCH_5070108_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_2';
+							tagArray[tagArrayLength++] = 'BATCH_openClose_NoUnit_L0_R1_T1';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L1_R100_T6_D1000';
+							break;
 						case 'BATCH_5070101_DEFAULT_PROFILE':
 						case 'BATCH_5070166_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_3';
@@ -4107,6 +4193,19 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_minimalDifferentialPressureSinceLastReport_Pa_L1_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_maximalDifferentialPressureSinceLastReport_Pa_L2_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L3_R1_T6';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L4_R10_T7';
+							tagArray[tagArrayLength++] = 'BATCH_differentialPressures_Pa_L5_R1_T7';
+							tagArray[tagArrayLength++] = 'BATCH_index_NoUnit_L6_R1_T10';
+							tagArray[tagArrayLength++] = 'BATCH_states_NoUnit_L7_R1_T1';
+             
+							break;
+						case 'BATCH_5070101_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070166_DEFAULT_PROFILE_BATTERY_V':
+							tagArray[i] = 'BATCH_tagsize_3';
+							tagArray[tagArrayLength++] = 'BATCH_meanDifferentialPressureSinceLastReport_Pa_L0_R1_T7';
+							tagArray[tagArrayLength++] = 'BATCH_minimalDifferentialPressureSinceLastReport_Pa_L1_R1_T7';
+							tagArray[tagArrayLength++] = 'BATCH_maximalDifferentialPressureSinceLastReport_Pa_L2_R1_T7';
+							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L3_R1_T6_D1000';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L4_R10_T7';
 							tagArray[tagArrayLength++] = 'BATCH_differentialPressures_Pa_L5_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_index_NoUnit_L6_R1_T10';
