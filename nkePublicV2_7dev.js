@@ -6,7 +6,7 @@
  *	 V2.5 (public)	:	06.06.2022 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) + bug fix (08-09.06.2022)
  *   V2.6_dev (private) :   26.07.2022 - Lisa DUTERTE <lduterte@watteco.fr> (WATTECO) with some modifications
  *   V2.6 (public) :   03.08.2022 - Lisa DUTERTE <lduterte@watteco.fr> (WATTECO)
- *   V2.7_dev (private) : 02.02.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) 
+ *   V2.7_dev (private) : 02.02.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting monito, ventilo
  */
 
 function Fixfield(encoded, digitstart, digitend, name) {
