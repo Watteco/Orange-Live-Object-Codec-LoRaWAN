@@ -3,10 +3,11 @@
  *   v1.0 (public)  : From THIEBAUD Claudine TGI/OLS
  *   V2.4 (public)  : 27-09-2021 - C.THIEBAUD (OLS) - ajouts tags profile, ajout clusters 8008 800C 4006 0403, decodage commande 8A
  *   V2.5_dev (private)	:	25.05.2022 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO)
- *	 V2.5 (public)	:	06.06.2022 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) + bug fix (08-09.06.2022)
+ *   V2.5 (public)	:	06.06.2022 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) + bug fix (08-09.06.2022)
  *   V2.6_dev (private) :   26.07.2022 - Lisa DUTERTE <lduterte@watteco.fr> (WATTECO) with some modifications
  *   V2.6 (public) :   03.08.2022 - Lisa DUTERTE <lduterte@watteco.fr> (WATTECO)
  *   V2.7_dev (private) : 02.02.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting monito, ventilo, add battery in V with _BATTERY_V
+ *   V2.8_dev (private) : 04.05.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting unit and decoding of Energy and Power Multi Metering
  */
 
 function Fixfield(encoded, digitstart, digitend, name) {
@@ -1521,8 +1522,8 @@ function decodeStandard(encoded, dataMessage) {
 					+ 'ubyte[4] SumActEnergyPhaseABC_measured; '
 					+ 'ubyte[4] SumReactEnergyPhaseA_measured; '
 					+ 'ubyte[4] SumReactEnergyPhaseB_measured; '
-					+ 'ubyte[4] SumReactEnergyPhaseC_measured; ';
-				+ 'ubyte[4] SumReactEnergyPhaseABC_measured; ';
+					+ 'ubyte[4] SumReactEnergyPhaseC_measured; '
+					+ 'ubyte[4] SumReactEnergyPhaseABC_measured; ';
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
 					data = JSON.parse(decoded);
@@ -1598,40 +1599,40 @@ function decodeStandard(encoded, dataMessage) {
 				delete data.data_length;
 				data.SumActPowerPhaseA = {};
 				data.SumActPowerPhaseA.value = calculateType23FromDslTab4Ubytes(data.sumactpowerphasea_measured);
-				data.SumActPowerPhaseA.unit = 'Wh/kWh';
+				data.SumActPowerPhaseA.unit = 'W/kW';
 				delete data.sumactpowerphasea_measured;
 
 				data.SumActPowerPhaseB = {};
 				data.SumActPowerPhaseB.value = calculateType23FromDslTab4Ubytes(data.sumactpowerphaseb_measured);
-				data.SumActPowerPhaseB.unit = 'Wh/kWh';
+				data.SumActPowerPhaseB.unit = 'W/kW';
 				delete data.sumactpowerphaseb_measured;
 
 				data.SumActPowerPhaseC = {};
 				data.SumActPowerPhaseC.value = calculateType23FromDslTab4Ubytes(data.sumactpowerphasec_measured);
-				data.SumActPowerPhaseC.unit = 'Wh/kWh';
+				data.SumActPowerPhaseC.unit = 'W/kW';
 				delete data.sumactpowerphasec_measured;
 
 				data.SumActPowerPhaseABC = {};
 				data.SumActPowerPhaseABC.value = calculateType23FromDslTab4Ubytes(data.sumactpowerphaseabc_measured);
-				data.SumActPowerPhaseABC.unit = 'Wh/kWh';
+				data.SumActPowerPhaseABC.unit = 'W/kW';
 				delete data.sumactpowerphaseabc_measured;
 				data.SumReactPowerPhaseA = {};
 				data.SumReactPowerPhaseA.value = calculateType23FromDslTab4Ubytes(data.sumreactpowerphasea_measured);
-				data.SumReactPowerPhaseA.unit = 'VARh/kVARh';
+				data.SumReactPowerPhaseA.unit = 'VAR/kVAR';
 				delete data.sumreactpowerphasea_measured;
 				data.SumReactPowerPhaseB = {};
 				data.SumReactPowerPhaseB.value = calculateType23FromDslTab4Ubytes(data.sumreactpowerphaseb_measured);
-				data.SumReactPowerPhaseB.unit = 'VARh/kVARh';
+				data.SumReactPowerPhaseB.unit = 'VAR/kVAR';
 				delete data.sumreactpowerphaseb_measured;
 
 				data.SumReactPowerPhaseC = {};
 				data.SumReactPowerPhaseC.value = calculateType23FromDslTab4Ubytes(data.sumreactpowerphasec_measured);
-				data.SumReactPowerPhaseC.unit = 'VARh/kVARh';
+				data.SumReactPowerPhaseC.unit = 'VAR/kVAR';
 				delete data.sumreactpowerphasec_measured;
 
 				data.SumReactPowerPhaseABC = {};
 				data.SumReactPowerPhaseABC.value = calculateType23FromDslTab4Ubytes(data.sumreactpowerphaseabc_measured);
-				data.SumReactPowerPhaseABC.unit = 'VARh/kVARh';
+				data.SumReactPowerPhaseABC.unit = 'VAR/kVAR';
 				delete data.sumreactpowerphaseabc_measured;
 				break;
 		}
