@@ -8,6 +8,7 @@
  *   V2.6 (public) :   03.08.2022 - Lisa DUTERTE <lduterte@watteco.fr> (WATTECO)
  *   V2.7_dev (private) : 02.02.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting monito, ventilo, add battery in V with _BATTERY_V
  *   V2.8_dev (private) : 04.05.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting unit and decoding of Energy and Power Multi Metering
+ *   V2.9_dev (private) : 28/06/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) Ventilo: set a dividing by 100 for the batch temperature 
  */
 
 function Fixfield(encoded, digitstart, digitend, name) {
@@ -4194,7 +4195,7 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_minimalDifferentialPressureSinceLastReport_Pa_L1_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_maximalDifferentialPressureSinceLastReport_Pa_L2_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L3_R1_T6';
-							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L4_R10_T7';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L4_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_differentialPressures_Pa_L5_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_index_NoUnit_L6_R1_T10';
 							tagArray[tagArrayLength++] = 'BATCH_states_NoUnit_L7_R1_T1';
@@ -4207,7 +4208,7 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_minimalDifferentialPressureSinceLastReport_Pa_L1_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_maximalDifferentialPressureSinceLastReport_Pa_L2_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L3_R1_T6_D1000';
-							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L4_R10_T7';
+							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L4_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_differentialPressures_Pa_L5_R1_T7';
 							tagArray[tagArrayLength++] = 'BATCH_index_NoUnit_L6_R1_T10';
 							tagArray[tagArrayLength++] = 'BATCH_states_NoUnit_L7_R1_T1';
