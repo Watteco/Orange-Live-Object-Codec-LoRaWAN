@@ -3,23 +3,19 @@
 The file "nkePulblicVx.y.js" is the full codec file used by Orange LiveObjects infastructure to decode Watteco sensors.
 
 Until now new development on the codec file "nkePublicV2_x.js" was only tested tested "online", 
-requiring from "Orange LiveObjects contacts" to install the "in test" codec in a test dedicated tenant and testing it remotely with a real sensor.
+requiring from "Orange LiveObjects" to install the "under test" codec in a private profil. 
+It can then be tested with a corresponding sensor sending the expected dataflow
+
 
 However, it is also possible to test locally the codec using the dedicated Java/Maven framework available at orange.
 
-## Orange LiveObjects contacts are: 
-- DL FT-FR LiveObjects decoder <liveobjects.decoder@orange.com>
-- Karoński Dawid - Korpo <Dawid.Karonski@orange.com>
-- KITTA Bartlomiej INNOV/IT-S <bartlomiej.kitta@orange.com>
-
-
-## Entry points for Orange liveObjects framework: 
+## Entry points for Orange liveObjects framework 
 - Documentation: https://liveobjects.orange-business.com/doc/html/lo_manual_v2.html#DATA_DECODER_SCRIPTABLE
 - GitHub: https://github.com/DatavenueLiveObjects/Payload-decoders/tree/master
 - Wiki: https://github.com/DatavenueLiveObjects/Payload-decoders/wiki
 
 
-## Orange development and test framework installation steps:
+## Orange development and test framework installation steps
 Notice that some others steps/version may lead to a working solution?
 
 - Install last Eclipse JDT IDE (ex: Eclipse IDE for Java developper 4.28). It contains necessary Maven and Junit.
