@@ -9,6 +9,7 @@
  *   V2.7_dev (private) : 02.02.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting monito, ventilo, add battery in V with _BATTERY_V
  *   V2.8_dev (private) : 04.05.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting unit and decoding of Energy and Power Multi Metering
  *   V2.9_dev (private) : 28/06/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) Ventilo: set a dividing by 100 for the batch temperature 
+ *   V2.10_dev (private) : 29/06/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Ajouts : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Ajout Batch default 50-70-201 (Angle & Chock), Ajout commande 04 (Write attribute response)
  */
 
 function Fixfield(encoded, digitstart, digitend, name) {
@@ -38,6 +39,7 @@ var mapEndpoint = {
 var mapCommandId = {
 	'00': 'Read Attribute Request',
 	'01': 'Read Attribute Response',
+	'04': 'Write Attribute response',
 	'06': 'Configure Reporting',
 	'07': 'Configure Reporting Response',
 	'08': 'Read Reporting Configuration',
@@ -76,6 +78,7 @@ var mapCluster = {
 	'800B': 'Voltage and Current Metering',
 	'800C': 'Concentration Measurement',
 	'800D': 'Voltage and Current Multi Metering',
+	'800E': 'Number',
 	'8052': 'Power Quality'
 };
 
@@ -101,7 +104,8 @@ var mapReport = {
 var mapAnalogInputAttributId = {
 	'0055': 'PresentValue',
 	'0100': 'ApplicationType',
-	'8003': 'PowerDuration'
+	'8003': 'PowerDuration',
+	'8004': 'ChockParameters'
 };
 var mapBasicAttributId = {
 	'0002': 'Firmware Version',
@@ -261,6 +265,13 @@ var mapVoltageCurrentMeteringAttributId = {
 
 var mapVoltageCurrentMultiMeteringAttributId = {
 	'0000': 'Measured values'
+};
+
+var mapNumberAttributId = {
+	'0000': 'PresentValue',
+	'0101': 'MeanValue',
+	'0102': 'MinValue',
+	'0103': 'MaxValue'
 };
 
 var mapCurrentPowerMode = {
@@ -430,6 +441,10 @@ function decodeStandard(encoded, dataMessage) {
 			mapAttributId = mapVoltageCurrentMultiMeteringAttributId;
 			decodeFunction = decodeVoltageCurrentMultiMeteringCluster;
 			break;
+		case '800E':
+			mapAttributId = mapNumberAttributId;
+			decodeFunction = decodeNumberCluster;
+			break;
 		case '8052':
 			mapAttributId = mapPowerQualityAttributId;
 			decodeFunction = decodePowerQualityCluster;
@@ -501,6 +516,18 @@ function decodeStandard(encoded, dataMessage) {
 			framedsl += 'ubyte[2] attribut_id; byte attribut_type; ';
 			data = decodeFunction(encoded, dataMessage);
 		}
+	} 
+	else if (cmdid.hexavalue == '04') { /* Write attribute response */
+		status = new Fixfield(encoded, 8, 9, 'status');
+		attributId = new Fixfield(encoded, 10, 13, 'attributId');
+		framedsl += 'byte status; ubyte[2] attribut_id; ';
+		try {
+			decoded = BinaryDecoder.decode(framedsl, encoded);
+			data = JSON.parse(decoded);
+		} catch (e) {
+			return "{\"error\":\"decoding failed\"}";
+		}
+		data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue, mapAttributId);
 	}
 	return JSON.stringify(data);
 
@@ -780,6 +807,46 @@ function decodeStandard(encoded, dataMessage) {
 				data.powerDuration.unit = 'ms';
 				data.powerDuration.value = data.power_duration;
 				delete data.power_duration;
+				break;				
+			case '8004': /* Chocks measurement parameters */
+				if (attributType.hexavalue != '19') {
+					return "{\"error\":\"wrong attributType\"}";
+				}
+				framedsl += 'bit:2 range_code; bit:4 freq_code; bit:2 mode_code; bit:7 threshold_lsbs; bit reserved; ';
+				try {
+					decoded = BinaryDecoder.decode(framedsl, encoded);
+					data = JSON.parse(decoded);
+				} catch (e) {
+					/* return "{"error\":\"decoding failed : \"}" + e.message; */
+					return JSON.parse('{"error": "decoding failed (' +  e.message + ')"}');
+				}
+				data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue, mapAttributId);
+
+				data.chockParameters = {};
+
+				modes = ["idle", "chock", "click", "unused"];
+				data.chockParameters.mode = modes[data.mode_code];
+				delete data.mode_code;
+				
+				freqs_hz = [0,1,10,25,50,100,200,400,1620,5376];
+				data.chockParameters.freq = {};
+				data.chockParameters.freq.value = (data.freq_code < 10 ? freqs_hz[data.freq_code] : 0);
+				data.chockParameters.freq.unit = "Hz";
+				delete data.freq_code;
+				
+				ranges_g = [2,4,8,16];
+				resolLsbs_mg = [16,32,62,186];
+				data.chockParameters.range = {};
+				data.chockParameters.range.value = (data.range_code < 4 ? ranges_g[data.range_code] : 0);
+				data.chockParameters.range.unit = "g (+/-)";
+				var resolLsb_mg = (data.range_code < 4 ? resolLsbs_mg[data.range_code] : 0);
+				delete data.range_code;
+
+				data.chockParameters.threshold = {};
+				data.chockParameters.threshold.value = data.threshold_lsbs * resolLsb_mg;
+				data.chockParameters.threshold.unit = "mg";
+				delete data.threshold_lsbs;
+
 				break;
 		}
 		return (data);
@@ -2744,6 +2811,41 @@ function decodeStandard(encoded, dataMessage) {
 		return (data);
 	}
 
+	function decodeNumberCluster(encoded) {
+		var data;
+		var decoded;
+		if (attributType.hexavalue != '21') {
+			return "{\"error\":\"wrong attributType\"}";
+		}
+		framedsl += 'ushort tmp_value; ';
+		if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+		try {
+			decoded = BinaryDecoder.decode(framedsl, encoded);
+			data = JSON.parse(decoded);
+		} catch (e) {
+			return "{\"error\":\"decoding failed\"}";
+		}
+		data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue, mapAttributId);
+		switch (attributId.hexavalue) {
+			case '0000': /* MeasuredValue */
+				data.presentValue = data.tmp_value;
+				break;
+			case '0101': /* mean value */
+				data.meanValue = data.tmp_value;
+				break;
+			case '0102': /* minimum value */
+				data.minValue = data.tmp_value;
+				break;
+			case '0103': /* maximum value */
+				data.maxValue = data.tmp_value;
+				break;
+		}
+		if (cmdid.hexavalue == '8A') {
+			data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+		}
+		delete data.tmp_value;
+		return (data);
+	}
 
 	function postProcessEndpointCommandIdAndCluster(data) {
 		delete data.endpoint;
@@ -2758,7 +2860,7 @@ function decodeStandard(encoded, dataMessage) {
 		data = postProcessEndpointCommandIdAndCluster(data);
 		delete data.attribut_id;
 		data = attributId.postProcessMap(data, mapAttributId);
-		if (cmdid == '01') {
+		if ((cmdid == '01') || (cmdid == '04')) {
 			delete data.status;
 			data = status.postProcessMap(data, mapStatusCommands);
 		}
@@ -4213,6 +4315,12 @@ function decodeBatch(encoded, dataMessage) {
 							tagArray[tagArrayLength++] = 'BATCH_index_NoUnit_L6_R1_T10';
 							tagArray[tagArrayLength++] = 'BATCH_states_NoUnit_L7_R1_T1';
              
+							break;
+
+						case 'BATCH_5070201_DEFAULT_PROFILE':
+							tagArray[i] = 'BATCH_tagsize_3';
+							tagArray[tagArrayLength++] = 'BATCH_ChockMaxAccelerations_mg_L0_R1_T6';
+							tagArray[tagArrayLength++] = 'BATCH_Angles_Deg_L1_R1_T12';
 							break;
 
 						default:
