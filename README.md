@@ -1,25 +1,26 @@
 # Orange-Live-Object-Codec-LoRaWAN
 
-This is the full codec file used by Orange LiveObjects for Watteco sensors.
+The file "nkePulblicVx.y.js" is the full codec file used by Orange LiveObjects infastructure to decode Watteco sensors.
 
-Current Orange LiveObjects contacts are: 
-DL FT-FR LiveObjects decoder <liveobjects.decoder@orange.com>
-Karoński Dawid - Korpo <Dawid.Karonski@orange.com>
-KITTA Bartlomiej INNOV/IT-S <bartlomiej.kitta@orange.com>
-
-Until now new dev on the codec file "nkePublicV2_x.js" have to be tested "online", 
-requiring from Orange contacts to install the "in test" codec in a test dedicated tenant and testing it remotely with a real sensor.
+Until now new development on the codec file "nkePublicV2_x.js" was only tested tested "online", 
+requiring from "Orange LiveObjects contacts" to install the "in test" codec in a test dedicated tenant and testing it remotely with a real sensor.
 
 However, it is also possible to test locally the codec using the dedicated Java/Maven framework available at orange.
 
-Documentation entry point: https://liveobjects.orange-business.com/doc/html/lo_manual_v2.html#DATA_DECODER_SCRIPTABLE
-GitHub: https://github.com/DatavenueLiveObjects/Payload-decoders/tree/master
-Wiki: https://github.com/DatavenueLiveObjects/Payload-decoders/wiki
+## Orange LiveObjects contacts are: 
+- DL FT-FR LiveObjects decoder <liveobjects.decoder@orange.com>
+- Karoński Dawid - Korpo <Dawid.Karonski@orange.com>
+- KITTA Bartlomiej INNOV/IT-S <bartlomiej.kitta@orange.com>
 
 
+## Entry points for Orange liveObjects framework: 
+- Documentation: https://liveobjects.orange-business.com/doc/html/lo_manual_v2.html#DATA_DECODER_SCRIPTABLE
+- GitHub: https://github.com/DatavenueLiveObjects/Payload-decoders/tree/master
+- Wiki: https://github.com/DatavenueLiveObjects/Payload-decoders/wiki
 
-Example of framework installation steps (PEG):
-Notice that some others steps/version may lead to a workig solution?
+
+## Orange development and test framework installation steps:
+Notice that some others steps/version may lead to a working solution?
 
 - Install last Eclipse JDT IDE (ex: Eclipse IDE for Java developper 4.28). It contains necessary Maven and Junit.
   (https://download.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/download.php?dropFile=eclipse-SDK-4.28-win32-x86_64.zip)
