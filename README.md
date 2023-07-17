@@ -2,24 +2,21 @@
 
 The file "nkePulblicVx.y.js" is the full codec file used by Orange LiveObjects infastructure to decode Watteco sensors.
 
-Until now new development on the codec file "nkePublicV2_x.js" was only tested tested "online", 
-requiring from "Orange LiveObjects contacts" to install the "in test" codec in a test dedicated tenant and testing it remotely with a real sensor.
-
-However, it is also possible to test locally the codec using the dedicated Java/Maven framework available at orange.
-
-## Orange LiveObjects contacts are: 
-- DL FT-FR LiveObjects decoder <liveobjects.decoder@orange.com>
-- Karoński Dawid - Korpo <Dawid.Karonski@orange.com>
-- KITTA Bartlomiej INNOV/IT-S <bartlomiej.kitta@orange.com>
+Until now new development on the codec file "nkePublicV2_x.js" was only tested tested [online](https://liveobjects.orange-business.com/#/login), 
+requiring from "Orange LiveObjects Decoder service" to install the "under test" codec as a private one. 
+It can then be tested with a corresponding sensor sending the expected dataflow. 
+Once validated a new demand to "Orange LiveObject Decoder service", can actuate the delivery for public usage of the codec. Finally, the existing Watteco public profiles/codecs available with Orange LiveObject are defined in the [Orange LiveObject tutorial support page](https://support.watteco.com/live-objects-lpwa-tutorial/) from Watteco. 
 
 
-## Entry points for Orange liveObjects framework: 
+However, it is also possible to test locally the codec before sending it to Orange. This can be done by using the dedicated Java/Maven framework available at orange. The way to use this framewaork is quickly described below.
+
+## Entry points for Orange liveObjects framework 
 - Documentation: https://liveobjects.orange-business.com/doc/html/lo_manual_v2.html#DATA_DECODER_SCRIPTABLE
 - GitHub: https://github.com/DatavenueLiveObjects/Payload-decoders/tree/master
 - Wiki: https://github.com/DatavenueLiveObjects/Payload-decoders/wiki
 
 
-## Orange development and test framework installation steps:
+## Orange development and test framework installation steps
 Notice that some others steps/version may lead to a working solution?
 
 - Install last Eclipse JDT IDE (ex: Eclipse IDE for Java developper 4.28). It contains necessary Maven and Junit.
