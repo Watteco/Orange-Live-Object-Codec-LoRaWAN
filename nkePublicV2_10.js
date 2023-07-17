@@ -9,19 +9,37 @@
  *   V2.7_dev (private) : 02.02.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting monito, ventilo, add battery in V with _BATTERY_V
  *   V2.8_dev (private) : 04.05.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting unit and decoding of Energy and Power Multi Metering
  *   V2.9_dev (private) : 28/06/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) Ventilo: set a dividing by 100 for the batch temperature 
- *   V2.10_dev (private) : 29/06/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Ajouts : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Ajout Batch default 50-70-201 (Angle & Chock), Ajout commande 04 (Write attribute response)
+ *   V2.10_dev (private) : 17/07/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Ajouts : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Ajout Batch default 50-70-201 (Angle & Chock), Ajout commande 04 (Write attribute response), Ajout 0x8A command for Node power decriptor report
  */
-
-function Fixfield(encoded, digitstart, digitend, name) {
-	this.name = name;
-	this.hexavalue = encoded.substring(digitstart, digitend + 1).toUpperCase();
+function d2h(d) {
+    var h = (d).toString(16);
+    h = h.length % 2 ? '0' + h : h;
+    return h;
 }
+function Fixfield (encoded, digitstart, digitend, name) {
+		this.name = name;
+		this.hexavalue = encoded.substring(digitstart, digitend + 1).toUpperCase();
+};
+
+function FixField2(hexavalue,name) {
+		this.name = name;
+		this.hexavalue = hexavalue.toUpperCase();
+};
+
 Fixfield.prototype.postProcessMap = function (data, map) {
 	var mapLocal = map;
 	var targetValue = mapLocal[this.hexavalue];
 	data[this.name] = targetValue;
 	return data;
 };
+
+FixField2.prototype.postProcessMap = function (data, map) {
+	var mapLocal = map;
+	var targetValue = mapLocal[this.hexavalue];
+	data[this.name] = targetValue;
+	return data;
+};
+
 
 var mapEndpoint = {
 	'11': '0',
@@ -1957,14 +1975,8 @@ function decodeStandard(encoded, dataMessage) {
 				if (attributType.hexavalue != '41') {
 					return "{\"error\":\"wrong attributType\"}";
 				}
-				if (cmdid.hexavalue == '01') {
-					currentPowerMode = new Fixfield(encoded, 18, 19, 'currentPowerMode');
-				} else if (cmdid.hexavalue == '0A') {
-					currentPowerMode = new Fixfield(encoded, 16, 17, 'currentPowerMode');
-				}
-				var currentPowerSource = new Fixfield(encoded, encoded.length - 2,
-					encoded.length - 1, 'currentPowerSource');
-				framedsl += ' ubyte power_length;'
+
+				framedsl += ' ubyte variable_field_length;'
 					+ 'ubyte current_power_mode; '
 					+ 'bit constant_or_external_power; bit rechargeable_battery; bit diposable_battery; bit solar_harvesting; bit tic_harvesting;  bit:3 skip_bits;  '
 					+ 'ushort[constant_or_external_power] constant_or_external_power_value;   '
@@ -1973,14 +1985,23 @@ function decodeStandard(encoded, dataMessage) {
 					+ 'ushort[solar_harvesting] solar_harvesting_value;  '
 					+ 'ushort[tic_harvesting] tic_harvesting_value;  '
 					+ 'ubyte currentPowerSource;';
+					
+				if (cmdid.hexavalue == '8A') 
+					framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+					
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
 					data = JSON.parse(decoded);
 				} catch (e) {
 					return "{\"error\":\"decoding failed\"}";
 				}
+	
+				var currentPowerMode = new FixField2(d2h(data.current_power_mode),'currentPowerMode');
+				data = currentPowerMode.postProcessMap(data, mapCurrentPowerMode);
+	
+				delete data.current_power_mode;
+				
 				data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue, mapAttributId);
-				delete data.power_length;
 				delete data.current_power_mode;
 				data = currentPowerMode.postProcessMap(data, mapCurrentPowerMode);
 				delete data.skip_bits;
@@ -2026,9 +2047,16 @@ function decodeStandard(encoded, dataMessage) {
 				}
 				delete data.tic_harvesting;
 				delete data.tic_harvesting_value;
+						
+				var currentPowerSource = new FixField2(d2h(data.currentpowersource),'currentPowerSource');
 				data = currentPowerSource.postProcessMap(data,
 					mapCurrentPowerSources);
 				delete data.currentpowersource;
+
+				if (cmdid.hexavalue == '8A') {
+					data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+				}
+				delete data.variable_field_length; 
 				break;
 		}
 		return (data);
@@ -3829,7 +3857,7 @@ function convertNumber(n, fromBase, toBase) {
 	return parseInt(n.toString(), fromBase).toString(toBase);
 }
 
-function lengthAccordingType(typ) {
+function lengthAccordingType(typ,variable_field_length) {
 	if (typ.length != 2) return 0;
 	var lg = 0;
 	switch (typ) {
@@ -3853,6 +3881,11 @@ function lengthAccordingType(typ) {
 		case '2B':
 		case '39':
 			lg = 4; break;
+		case '41':
+		case '42':
+		case '43':
+		case '4C':
+			lg = variable_field_length; break;
 	}
 	return lg;
 }
@@ -3913,8 +3946,9 @@ function decodeCommand8A(encoded, data, attributTypeHexavalue, fieldIndex) {
 	delete data.cr;
 	data.reportParameters.newModeConfiguration = (data.nmc == 1) ? true : false;
 	delete data.nmc;
-
-	var longueurselontype = lengthAccordingType(attributTypeHexavalue);
+  
+  var variableLength = (typeof data.variable_field_length == "undefined" ? 0 : data.variable_field_length);
+	var longueurselontype = lengthAccordingType(attributTypeHexavalue,variableLength);
 	var partiehexacause = encoded.substring(14 + (longueurselontype * 2) + 2);
 	data.criterions = [];
 
@@ -3979,11 +4013,11 @@ function decodeCommand8A(encoded, data, attributTypeHexavalue, fieldIndex) {
 			}
 			if (criterion.criteriaSlotDescriptor.mode != 'unused') {
 				newdsl += dslAccordingType(attributTypeHexavalue) + ' value ; ';
-				offset += lengthAccordingType(attributTypeHexavalue) * 2;
+				offset += lengthAccordingType(attributTypeHexavalue,variableLength) * 2;
 			}
 			if (criterion.criteriaSlotDescriptor.mode == 'threshold' || criterion.criteriaSlotDescriptor.mode == 'threshold with actions') {
 				newdsl += dslAccordingType(attributTypeHexavalue) + ' gap ; ';
-				offset += lengthAccordingType(attributTypeHexavalue) * 2;
+				offset += lengthAccordingType(attributTypeHexavalue,variableLength) * 2;
 			}
 			if (criterion.criteriaSlotDescriptor.mode == 'threshold') {
 				newdsl += 'bit:7 nbocc ; bit hl ;';
@@ -4319,8 +4353,8 @@ function decodeBatch(encoded, dataMessage) {
 
 						case 'BATCH_5070201_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_3';
-							tagArray[tagArrayLength++] = 'BATCH_ChockMaxAccelerations_mg_L0_R1_T6';
-							tagArray[tagArrayLength++] = 'BATCH_Angles_Deg_L1_R1_T12';
+							tagArray[tagArrayLength++] = 'BATCH_chockMaxAccelerations_mg_L0_R1_T6';
+							tagArray[tagArrayLength++] = 'BATCH_angles_Deg_L1_R1_T12';
 							break;
 
 						default:

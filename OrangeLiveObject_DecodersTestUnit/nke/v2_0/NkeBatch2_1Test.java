@@ -36,7 +36,7 @@ import org.junit.runners.MethodSorters;
 							encoding = "watteco_generic", hidden = false, developer = "Watteco / Nke-Watteco / Orange")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NkeBatch2_1Test  extends TestBase {
-	private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+	private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 	
 /*
     @Test
@@ -1254,6 +1254,96 @@ public class NkeBatch2_1Test  extends TestBase {
         assertThat(frame.getCOV().getValues().get(2).getTimestamp()).isEqualTo("2017-11-07T17:12:02.000Z");
         assertThat(frame.getCOV().getValues().get(2).getValue()).isEqualTo(200);    
     }
+	
+	@Test
+	public void should_decode_5070201_payload_with_fields_tag() throws JsDecodingException {  
+			
+		String inputDataMessage = "{" + " \"metadata\": {" + " \"source\": \"urn:lora:70B3D516C0000068\"," 
+				+ "   \"connector\": \"lora\","
+	            + "   \"encoding\": \"nke_watteco_v2.4\"," 
+				+ "   \"network\": {" + " \"lora\": {" + " \"port\": 6,"
+	            + "   \"devEUI\": \"70B3D516C0000068\"" + " } }  }," 
+				+ "   \"streamId\": \"urn:lora:70B3D516C0000068!uplink\","
+	            + "   \"created\": \"2017-11-07T17:17:26.000Z\"," + "   \"model\": \"lora_v0\"," 
+	            + "   \"value\": {" + " \"payload\": \"200400808049162c8a4042e0cccd000379c7a185db31f0873bc051b10bfe05beec50dc6b074b1b8005\"" + "   },"
+	            + "   \"timestamp\": \"2017-11-07T17:17:25.000Z\"" + ","
+	            + "   \"tags\": [ "
+	            + "\"BATCH_chockMaxAccelerations_mg_L0_R1_T6\", "
+	            + "\"BATCH_angles_Deg_L1_R1_T12\", "
+	            + "\"BATCH_tagsize_3\" ]" + "}";    
+		
+	    String input = "200400808049162c8a4042e0cccd000379c7a185db31f0873bc051b10bfe05beec50dc6b074b1b8005";              
+	    NKEBatch frame = formatAndDecode(SCRIPT_PATH, input, inputDataMessage, NKEBatch.class);
+	    assertThat(frame.getBatchCounter()).isEqualTo(4);
+	    assertThat(frame.getBatchTimestamp()).isEqualTo("2017-11-07T17:17:25.000Z");
+	    assertThat(frame.getAngles().getUnit()).isEqualTo("Deg");
+	    assertThat(frame.getAngles().getValues().size()).isEqualTo(1);
+	    assertThat(frame.getAngles().getValues().get(0).getTimestamp()).isEqualTo("2017-11-07T17:14:32.000Z");
+	    assertThat(frame.getAngles().getValues().get(0).getValue()).isEqualTo(112.4000015258789f);   
+	    assertThat(frame.getChockMaxAccelerations().getValues().size()).isEqualTo(7);
+	    assertThat(frame.getChockMaxAccelerations().getUnit()).isEqualTo("mg");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(0).getTimestamp()).isEqualTo("2017-11-07T17:11:53.000Z");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(0).getValue()).isEqualTo(11352);
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(1).getTimestamp()).isEqualTo("2017-11-07T17:11:59.000Z");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(1).getValue()).isEqualTo(19822);
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(2).getTimestamp()).isEqualTo("2017-11-07T17:12:09.000Z");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(2).getValue()).isEqualTo(3566);
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(3).getTimestamp()).isEqualTo("2017-11-07T17:12:14.000Z");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(3).getValue()).isEqualTo(7825);
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(4).getTimestamp()).isEqualTo("2017-11-07T17:12:21.000Z");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(4).getValue()).isEqualTo(10000);
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(5).getTimestamp()).isEqualTo("2017-11-07T17:17:23.000Z");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(5).getValue()).isEqualTo(3327);
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(6).getTimestamp()).isEqualTo("2017-11-07T17:17:24.000Z");
+	    assertThat(frame.getChockMaxAccelerations().getValues().get(6).getValue()).isEqualTo(9139);  
+	}
+	
+    
+	@PayloadDescription(name = "BATCH_5070201_DEFAULT_PROFILE for device 50-70-201", description = "Batch payload sent by a device 50-70-201 associated to the tag BATCH_5070201_DEFAULT_PROFILE. "
+			+ "\nThe BATCH_5070201_DEFAULT_PROFILE tag is replaced by the decoder by these following field batch tags:\n"
+			+ "BATCH_tagsize_3, \n "
+			+ "BATCH_chockMaxAccelerations_mg_L0_R1_T6, \n"
+	        + "BATCH_angles_Deg_L1_R1_T12 ")
+	@Test
+	public void should_decode_5070201_payload_with_tagBatchProfile() throws JsDecodingException {
+		
+		String inputDataMessage = "{" + " \"metadata\": {" + " \"source\": \"urn:lora:70B3D516C0000068\"," 
+				+ "   \"connector\": \"lora\","
+	            + "   \"encoding\": \"nke_watteco_v2.4\"," 
+				+ "   \"network\": {" + " \"lora\": {" + " \"port\": 6,"
+	            + "   \"devEUI\": \"70B3D516C0000068\"" + " } }  }," 
+				+ "   \"streamId\": \"urn:lora:70B3D516C0000068!uplink\","
+	            + "   \"created\": \"2017-11-07T17:17:26.000Z\"," + "   \"model\": \"lora_v0\"," 
+	            + "   \"value\": {" + " \"payload\": \"200400808049162c8a4042e0cccd000379c7a185db31f0873bc051b10bfe05beec50dc6b074b1b8005\"" + "   },"
+	            + "   \"timestamp\": \"2017-11-07T17:17:25.000Z\"" + ","
+	            + "   \"tags\": [ "
+	            + "\"BATCH_5070201_DEFAULT_PROFILE\"]}";         
+	   
+	    String input = "200400808049162c8a4042e0cccd000379c7a185db31f0873bc051b10bfe05beec50dc6b074b1b8005";              
+	    NKEBatch frame = formatAndDecode(SCRIPT_PATH, input, inputDataMessage, NKEBatch.class);
+		assertThat(frame.getBatchCounter()).isEqualTo(4);
+		assertThat(frame.getBatchTimestamp()).isEqualTo("2017-11-07T17:17:25.000Z");
+		assertThat(frame.getAngles().getUnit()).isEqualTo("Deg");
+		assertThat(frame.getAngles().getValues().size()).isEqualTo(1);
+		assertThat(frame.getAngles().getValues().get(0).getTimestamp()).isEqualTo("2017-11-07T17:14:32.000Z");
+		assertThat(frame.getAngles().getValues().get(0).getValue()).isEqualTo(112.4000015258789f);   
+		assertThat(frame.getChockMaxAccelerations().getValues().size()).isEqualTo(7);
+		assertThat(frame.getChockMaxAccelerations().getUnit()).isEqualTo("mg");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(0).getTimestamp()).isEqualTo("2017-11-07T17:11:53.000Z");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(0).getValue()).isEqualTo(11352);
+		assertThat(frame.getChockMaxAccelerations().getValues().get(1).getTimestamp()).isEqualTo("2017-11-07T17:11:59.000Z");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(1).getValue()).isEqualTo(19822);
+		assertThat(frame.getChockMaxAccelerations().getValues().get(2).getTimestamp()).isEqualTo("2017-11-07T17:12:09.000Z");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(2).getValue()).isEqualTo(3566);
+		assertThat(frame.getChockMaxAccelerations().getValues().get(3).getTimestamp()).isEqualTo("2017-11-07T17:12:14.000Z");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(3).getValue()).isEqualTo(7825);
+		assertThat(frame.getChockMaxAccelerations().getValues().get(4).getTimestamp()).isEqualTo("2017-11-07T17:12:21.000Z");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(4).getValue()).isEqualTo(10000);
+		assertThat(frame.getChockMaxAccelerations().getValues().get(5).getTimestamp()).isEqualTo("2017-11-07T17:17:23.000Z");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(5).getValue()).isEqualTo(3327);
+		assertThat(frame.getChockMaxAccelerations().getValues().get(6).getTimestamp()).isEqualTo("2017-11-07T17:17:24.000Z");
+		assertThat(frame.getChockMaxAccelerations().getValues().get(6).getValue()).isEqualTo(9139); 
+	}
     
 }
 

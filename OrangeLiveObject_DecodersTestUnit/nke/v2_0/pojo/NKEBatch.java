@@ -68,6 +68,12 @@ public class NKEBatch {
 	@FieldDescription(description = "Differential pressure values, field build from tag BATCH_states_NoUnit_L7_R1_T10")
 	public BatchIntList states;
 	
+	@FieldDescription(description = "List of angles, field build from tag BATCH_Angle_Deg_L1_R1_T12")
+	public BatchFloatList angles;
+	
+	@FieldDescription(description = "List of chocks, field build from tag BATCH_ChockMaxAccelerations_mg_L0_R1_T6")
+	public BatchIntList chockMaxAccelerations;
+	
 	@FieldDescription(description = "Message error that can indicate an error in tag configuration. Values can be: <ul>"
 			+ "<li>defined batch tags don't match the payload</li> "
 			+ "<li>divide not numeric in tag</li> "

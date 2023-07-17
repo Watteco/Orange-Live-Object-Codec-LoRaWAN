@@ -7,6 +7,7 @@ import com.orange.lo.decoder.js.doc.annotation.DeviceDescription;
 import com.orange.lo.decoder.js.doc.annotation.PayloadDescription;
 import com.orange.lo.decoder.js.exception.JsDecodingException;
 import com.orange.lo.decoder.js.nke.v2_0.pojo.NKEClusterBasic;
+import com.orange.lo.decoder.js.nke.v2_0.pojo.NKEClusterConcentrationMeasurement;
 import com.orange.lo.decoder.js.nke.v2_0.pojo.NKEClusterConfiguration;
 import com.orange.lo.decoder.js.nke.v2_0.pojo.NKEClusterLoRaWAN;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ import org.junit.runners.MethodSorters;
 @Slf4j
 public class NkeTest extends TestBase {
 
-    private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+    private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 
     @Test
     public void should_profile() throws JsDecodingException {
@@ -249,6 +250,28 @@ public class NkeTest extends TestBase {
         assertThat(clusterConfiguration.getPowerSources().getSolHarvesting().getAvailable()).isFalse();
         assertThat(clusterConfiguration.getPowerSources().getTicHarvesting().getAvailable()).isFalse();
         assertThat(clusterConfiguration.getCurrentPowerSource()).isEqualTo("Constant (Main) Or External Power");
+    }
+    
+    @Test
+    @PayloadDescription(name = "ClusterConfiguration_NodePowerDescriptor", description = "Cluster: Configuration, Attribut: Node power descriptor, Command: Report Attributes.")
+    public void should_decode_0050_configuration_attribut0006_cmd8A_payload() throws JsDecodingException {
+        /* real payload */
+        String input = "118a00500006410501040c540498d0";
+
+        NKEClusterConfiguration clusterConfiguration = formatAndDecode(SCRIPT_PATH, input, NKEClusterConfiguration.class);
+        assertThat(clusterConfiguration.getMessageType()).isEqualTo("Configuration");
+        assertThat(clusterConfiguration.getEndpoint()).isEqualTo("0");
+        assertThat(clusterConfiguration.getCommandId()).isEqualTo("Threshold Report");
+        assertThat(clusterConfiguration.getAttributId()).isEqualTo("Node power descriptor");
+        assertThat(clusterConfiguration.getCurrentPowerMode()).isEqualTo("Periodically ON");
+        assertThat(clusterConfiguration.getPowerSources().getDiposBattery().getAvailable()).isTrue();
+        assertThat(clusterConfiguration.getPowerSources().getDiposBattery().getValue()).isEqualTo(3.156f);
+        assertThat(clusterConfiguration.getPowerSources().getDiposBattery().getUnit()).isEqualTo("V");
+        assertThat(clusterConfiguration.getPowerSources().getRechargBattery().getAvailable()).isFalse();
+        assertThat(clusterConfiguration.getPowerSources().getConstOrExtPower().getAvailable()).isFalse();
+        assertThat(clusterConfiguration.getPowerSources().getSolHarvesting().getAvailable()).isFalse();
+        assertThat(clusterConfiguration.getPowerSources().getTicHarvesting().getAvailable()).isFalse();
+        assertThat(clusterConfiguration.getCurrentPowerSource()).isEqualTo("Diposable Battery");
     }
 
     @Test

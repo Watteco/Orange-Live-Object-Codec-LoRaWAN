@@ -18,6 +18,8 @@ public class NKEClusterAnalogInput extends NKEFrameHeader {
 	public String applicationUnit;
 	@FieldDescription(description = "The power duration attribute allows to change the duration of the power output. Only available on v3.5.2. Unit value is in ms")
 	public PowerDuration powerDuration;
+	@FieldDescription(description = "The Chock measurement parameters (Mode, Sampling Freq, Range, Threshold). Only available on v3.5.2. for Inclino sensor")
+	public ChockParameters chockParameters;
 	
 	@Data
 	@OutputPojo
@@ -25,6 +27,46 @@ public class NKEClusterAnalogInput extends NKEFrameHeader {
 		@FieldDescription(description = "Power duration unit is millisecond")
 		public String unit;
 		@FieldDescription(description = "Power duration value")
+		public Integer value;
+	}
+	
+	@Data
+	@OutputPojo
+	public class ChockParameters {
+		@FieldDescription(description = "Mode of chocks detection (idle, chock or click)")
+		public String mode;
+		@FieldDescription(description = "Sampling frequency")
+		public Frequency freq;	
+		@FieldDescription(description = "Range")
+		public Range range;	
+		@FieldDescription(description = "Threshold")
+		public Threshold threshold;	
+	}
+	
+	@Data
+	@OutputPojo
+	public class Frequency {
+		@FieldDescription(description = "Monitoring frequency unit")
+		public String unit;
+		@FieldDescription(description = "Monitoring frequency value")
+		public Integer value;
+	}
+	
+	@Data
+	@OutputPojo
+	public class Range {
+		@FieldDescription(description = "Monitoring range unit")
+		public String unit;
+		@FieldDescription(description = "Monitoring range value")
+		public Integer value;
+	}
+	
+	@Data
+	@OutputPojo
+	public class Threshold {
+		@FieldDescription(description = "Threshold unit")
+		public String unit;
+		@FieldDescription(description = "Threshold value")
 		public Integer value;
 	}
 	
