@@ -1,0 +1,1 @@
+25.05.2022 - Tests and POJOs are not up to date with version 2.5
