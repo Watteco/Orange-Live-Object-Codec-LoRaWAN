@@ -43,7 +43,7 @@ encoding = "watteco_generic", hidden = true)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NkeVaqaoTest extends TestBase {
 	
-	private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+	private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 
 
     @Test

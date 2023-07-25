@@ -26,7 +26,7 @@ import org.junit.runners.MethodSorters;
         encoding = "watteco_generic", hidden = false)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NkeS0Test extends TestBase {
-    private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+    private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 
     @Test
     public void should_decode_bad_payload() throws JsDecodingException {

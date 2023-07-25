@@ -26,7 +26,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NkeSensoTest extends TestBase {
 
-    private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+    private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 
     @Test
     public void should_profile() throws JsDecodingException {

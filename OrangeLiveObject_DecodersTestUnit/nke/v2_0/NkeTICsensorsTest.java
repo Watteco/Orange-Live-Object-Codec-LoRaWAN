@@ -39,7 +39,7 @@ Cluster selon le compteur connecté:
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NkeTICsensorsTest extends TestBase {
 
-    private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+    private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 
     @Test
     public void should_profile() throws JsDecodingException {

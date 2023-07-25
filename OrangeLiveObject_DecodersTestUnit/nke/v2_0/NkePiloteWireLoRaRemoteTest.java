@@ -26,7 +26,7 @@ import org.junit.FixMethodOrder;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 
 public class NkePiloteWireLoRaRemoteTest extends TestBase {
-	private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+	private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 	
 
     @Test

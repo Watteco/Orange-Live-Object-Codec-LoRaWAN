@@ -9,7 +9,7 @@
  *   V2.7_dev (private) : 02.02.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting monito, ventilo, add battery in V with _BATTERY_V
  *   V2.8_dev (private) : 04.05.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting unit and decoding of Energy and Power Multi Metering
  *   V2.9_dev (private) : 28/06/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) Ventilo: set a dividing by 100 for the batch temperature 
- *   V2.10_dev (private) : 17/07/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Ajouts : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Ajout Batch default 50-70-201 (Angle & Chock), Ajout commande 04 (Write attribute response), Ajout 0x8A command for Node power decriptor report
+ *   V2.10_dev (private) : 25/07/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Add : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Batch default 50-70-201 (Angle & Chock), Commande 04 (Write attribute response), Fix Cause presence detection (cf hasCause), Add 0x8A command for Node power decriptor report
  */
 function d2h(d) {
     var h = (d).toString(16);
@@ -765,7 +765,8 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'int present_value ;';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 22);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
 					data = JSON.parse(decoded);
@@ -775,8 +776,8 @@ function decodeStandard(encoded, dataMessage) {
 				data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue, mapAttributId);
 				data.value = calculateType39FromDslInt(data.present_value, 6);
 				delete data.present_value;
-				if (cmdid.hexavalue == '8A') {
-					data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+				if (hasCause) {
+					data = decodeCause(encoded, data, attributType.hexavalue, false);
 				}
 				break;
 			case '0100': /* applicationType */
@@ -879,7 +880,8 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'ubyte[4] counter ;';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 22);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
 					data = JSON.parse(decoded);
@@ -889,8 +891,8 @@ function decodeStandard(encoded, dataMessage) {
 				data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue, mapAttributId);
 				data.counterCurrentValue = calculateType23FromDslTab4Ubytes(data.counter);
 				delete data.counter;
-				if (cmdid.hexavalue == '8A') {
-					data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+				if (hasCause) {
+					data = decodeCause(encoded, data, attributType.hexavalue, false);
 				}
 				break;
 			case '0054': /* Polarity */
@@ -942,7 +944,8 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'ushort debounce ;';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -956,8 +959,8 @@ function decodeStandard(encoded, dataMessage) {
 					unit: "milliseconds"
 				};
 				delete data.debounce;
-				if (cmdid.hexavalue == '8A') {
-					data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+				if (hasCause) {
+					data = decodeCause(encoded, data, attributType.hexavalue, false);
 				}
 				break;
 		}
@@ -1766,7 +1769,8 @@ function decodeStandard(encoded, dataMessage) {
 			return "{\"error\":\"wrong attributType\"}";
 		}
 		framedsl += 'short measured_value; ';
-		if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+		hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+		if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 		try {
 			decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -1793,8 +1797,8 @@ function decodeStandard(encoded, dataMessage) {
 				break;
 		}
 		delete data.measured_value;
-		if (cmdid.hexavalue == '8A') {
-			data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+		if (hasCause) {
+			data = decodeCause(encoded, data, attributType.hexavalue, false);
 		}
 		return (data);
 	}
@@ -1805,7 +1809,8 @@ function decodeStandard(encoded, dataMessage) {
 			return "{\"error\":\"wrong attributType\"}";
 		}
 		framedsl += 'short measured_value; ';
-		if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+		hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+		if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 		try {
 			decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -1832,8 +1837,8 @@ function decodeStandard(encoded, dataMessage) {
 				break;
 		}
 		delete data.measured_value;
-		if (cmdid.hexavalue == '8A') {
-			data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+		if (hasCause) {
+			data = decodeCause(encoded, data, attributType.hexavalue, false);
 		}
 		return (data);
 	}
@@ -1845,7 +1850,8 @@ function decodeStandard(encoded, dataMessage) {
 			return "{\"error\":\"wrong attributType\"}";
 		}
 		framedsl += 'ushort measured_value; ';
-		if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+		hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+		if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 		try {
 			decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -1872,8 +1878,8 @@ function decodeStandard(encoded, dataMessage) {
 				break;
 		}
 		delete data.measured_value;
-		if (cmdid.hexavalue == '8A') {
-			data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+		if (hasCause) {
+			data = decodeCause(encoded, data, attributType.hexavalue, false);
 		}
 		return (data);
 	}
@@ -1986,7 +1992,26 @@ function decodeStandard(encoded, dataMessage) {
 					+ 'ushort[tic_harvesting] tic_harvesting_value;  '
 					+ 'ubyte currentPowerSource;';
 					
-				if (cmdid.hexavalue == '8A') 
+				var paysize = 0;
+				try {
+					var data1;
+					decoded = BinaryDecoder.decode(framedsl, encoded);
+					data1 = JSON.parse(decoded);
+					paysize = 11; /* 110ACCCCaaaa41ssiijj...kk */
+					if (data1.constant_or_external_power == 1) paysize += 2;
+					if (data1.rechargeable_battery == 1) paysize += 2;
+					if (data1.diposable_battery == 1) paysize += 2;
+					if (data1.solar_harvesting == 1) paysize += 2;
+					if (data1.tic_harvesting == 1) paysize += 2;
+					paysize *= 2;
+					delete data1;
+					
+				} catch (e) {
+					return "{\"error\":\"decoding failed\"}";
+				}
+					
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > paysize);
+				if (hasCause) 
 					framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 					
 				try {
@@ -2053,8 +2078,8 @@ function decodeStandard(encoded, dataMessage) {
 					mapCurrentPowerSources);
 				delete data.currentpowersource;
 
-				if (cmdid.hexavalue == '8A') {
-					data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+				if (hasCause) {
+					data = decodeCause(encoded, data, attributType.hexavalue, false);
 				}
 				delete data.variable_field_length; 
 				break;
@@ -2233,7 +2258,8 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'int volume_index ;';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 22);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
 					data = JSON.parse(decoded);
@@ -2243,8 +2269,8 @@ function decodeStandard(encoded, dataMessage) {
 				data = postProcessFirstFixfieldsInFrame(data, cmdid.hexavalue, mapAttributId);
 				data.volumeIndex = Number(data.volume_index);
 				delete data.volume_index;
-				if (cmdid.hexavalue == '8A') {
-					data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+				if (hasCause) {
+					data = decodeCause(encoded, data, attributType.hexavalue, false);
 				}
 				break;
 			case '0001': /* volumeDisplayMode */
@@ -2571,6 +2597,7 @@ function decodeStandard(encoded, dataMessage) {
 	function decodeDifferentialPressureMeasurementCluster(encoded) {
 		var data;
 		var decoded;
+		var hasCause = false;
 		switch (attributId.hexavalue) {
 			case '0000': /* 'Measured value' */
 			case '0001': /* 'Min measured value' */
@@ -2582,7 +2609,9 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'short measured_value; ';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -2631,7 +2660,8 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'ubyte[4] period ;';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 22);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -2659,7 +2689,9 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'ushort samples; ';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -2678,8 +2710,8 @@ function decodeStandard(encoded, dataMessage) {
 				break;
 		}
 
-		if (cmdid.hexavalue == '8A') {
-			data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+		if (hasCause) {
+			data = decodeCause(encoded, data, attributType.hexavalue, false);
 		}
 		return (data);
 	}
@@ -2697,7 +2729,8 @@ function decodeStandard(encoded, dataMessage) {
 					return "{\"error\":\"wrong attributType\"}";
 				}
 				framedsl += 'ushort measured_value; ';
-				if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+				hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+				if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 
 				try {
 					decoded = BinaryDecoder.decode(framedsl, encoded);
@@ -2727,8 +2760,8 @@ function decodeStandard(encoded, dataMessage) {
 					data.maximum.unit = 'ppm or IAQ';
 				}
 				delete data.measured_value;
-				if (cmdid.hexavalue == '8A') {
-					data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+				if (hasCause) {
+					data = decodeCause(encoded, data, attributType.hexavalue, false);
 				}
 				break;
 
@@ -2846,7 +2879,8 @@ function decodeStandard(encoded, dataMessage) {
 			return "{\"error\":\"wrong attributType\"}";
 		}
 		framedsl += 'ushort tmp_value; ';
-		if (cmdid.hexavalue == '8A') framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
+		hasCause = ((cmdid.hexavalue == '8A') || (cmdid.hexavalue == '0A')) && (encoded.length > 18);
+		if (hasCause) framedsl += 'bit batch; bit nohp; bit secu; bit secifa; bit:2 cr; bit todel;bit nmc; ';
 		try {
 			decoded = BinaryDecoder.decode(framedsl, encoded);
 			data = JSON.parse(decoded);
@@ -2868,8 +2902,8 @@ function decodeStandard(encoded, dataMessage) {
 				data.maxValue = data.tmp_value;
 				break;
 		}
-		if (cmdid.hexavalue == '8A') {
-			data = decodeCommand8A(encoded, data, attributType.hexavalue, false);
+		if (hasCause) {
+			data = decodeCause(encoded, data, attributType.hexavalue, false);
 		}
 		delete data.tmp_value;
 		return (data);
@@ -3926,7 +3960,7 @@ function calculateType23FromDslTab4Ubytes(tabdecodedvalue) {
 	return val;
 }
 
-function decodeCommand8A(encoded, data, attributTypeHexavalue, fieldIndex) {
+function decodeCause(encoded, data, attributTypeHexavalue, fieldIndex) {
 	delete data.todel;
 	data.reportParameters = {};
 	data.reportParameters.batch = (data.batch == 1) ? true : false;

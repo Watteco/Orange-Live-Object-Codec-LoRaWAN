@@ -22,7 +22,7 @@ encoding = "watteco_generic", hidden = false)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NkeRemoteTemperatureTest extends TestBase {
 	
-	private final String SCRIPT_PATH = "nke/nkePublicV2_8";
+	private final String SCRIPT_PATH = "nke/nkePublicV2_10";
 
     @Test
     public void should_profile() throws JsDecodingException {
