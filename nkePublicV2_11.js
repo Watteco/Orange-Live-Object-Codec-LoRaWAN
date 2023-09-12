@@ -10,6 +10,7 @@
  *   V2.8_dev (private) : 04.05.2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) correcting unit and decoding of Energy and Power Multi Metering
  *   V2.9_dev (private) : 28/06/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) Ventilo: set a dividing by 100 for the batch temperature 
  *   V2.10_dev (private) : 25/07/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Add : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Batch default 50-70-201 (Angle & Chock), Commande 04 (Write attribute response), Fix Cause presence detection (cf hasCause), Add 0x8A command for Node power decriptor report
+ *   V2.11_dev (private) : 12/09/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) fixed decoding batch Voltage for BATCH_5070043_DEFAULT_PROFILE...
  */
 function d2h(d) {
     var h = (d).toString(16);
@@ -4167,14 +4168,12 @@ function decodeBatch(encoded, dataMessage) {
 						case 'BATCH_5070126_DEFAULT_PROFILE': /*Remote T */
 							tagArray[i] = 'BATCH_tagsize_1';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
-							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L1_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L1_R100_T6';
 							break;
 						case 'BATCH_5070043_DEFAULT_PROFILE_BATTERY_V': /*Remote T */
 						case 'BATCH_5070126_DEFAULT_PROFILE_BATTERY_V': /*Remote T */
 							tagArray[i] = 'BATCH_tagsize_1';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
-							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L1_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L1_R100_T6_D1000';
 							break;
 						case 'BATCH_5070099_DEFAULT_PROFILE': /* atmo */
