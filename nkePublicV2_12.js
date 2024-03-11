@@ -11,7 +11,7 @@
  *   V2.9_dev (private) : 28/06/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) Ventilo: set a dividing by 100 for the batch temperature 
  *   V2.10_dev (private) : 25/07/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Add : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Batch default 50-70-201 (Angle & Chock), Commande 04 (Write attribute response), Fix Cause presence detection (cf hasCause), Add 0x8A command for Node power decriptor report
  *   V2.11_dev (private) : 12/09/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) fixed decoding batch Voltage for BATCH_5070043_DEFAULT_PROFILE...
- *   V2.11_dev (private) : 11/03/2024 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) add for 50-70-205 and 50-70-231 
+ *   V2.12_dev (private) : 11/03/2024 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) add for 50-70-205 and 50-70-231 
  */
 function d2h(d) {
     var h = (d).toString(16);
