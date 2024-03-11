@@ -11,6 +11,7 @@
  *   V2.9_dev (private) : 28/06/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) Ventilo: set a dividing by 100 for the batch temperature 
  *   V2.10_dev (private) : 25/07/2023 - Pierre-emmanuel Goudet <pegoudet@watteco.fr> (WATTECO) - Add : Cluster 800E (Number), Attribut AnalogInput 8004 (Chocks configuration), Batch default 50-70-201 (Angle & Chock), Commande 04 (Write attribute response), Fix Cause presence detection (cf hasCause), Add 0x8A command for Node power decriptor report
  *   V2.11_dev (private) : 12/09/2023 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) fixed decoding batch Voltage for BATCH_5070043_DEFAULT_PROFILE...
+ *   V2.11_dev (private) : 11/03/2024 - Mathieu POUILLOT <mpouillot@watteco.fr> (WATTECO) add for 50-70-205 and 50-70-231 
  */
 function d2h(d) {
     var h = (d).toString(16);
@@ -4266,6 +4267,8 @@ function decodeBatch(encoded, dataMessage) {
 						case 'BATCH_5070191_DEFAULT_PROFILE':
 						case 'BATCH_5070162_DEFAULT_PROFILE':
 						case 'BATCH_5070200_DEFAULT_PROFILE':
+						case 'BATCH_5070205_DEFAULT_PROFILE':
+						case 'BATCH_5070232_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_2';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_relativeHumidities_%RH_L1_R100_T6_D100';
@@ -4276,6 +4279,8 @@ function decodeBatch(encoded, dataMessage) {
 						case 'BATCH_5070191_DEFAULT_PROFILE_BATTERY_V':
 						case 'BATCH_5070162_DEFAULT_PROFILE_BATTERY_V':
 						case 'BATCH_5070200_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070205_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070232_DEFAULT_PROFILE_BATTERY_V':
 							tagArray[i] = 'BATCH_tagsize_2';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_relativeHumidities_%RH_L1_R100_T6_D100';
@@ -4284,6 +4289,7 @@ function decodeBatch(encoded, dataMessage) {
 							break;
 						case 'BATCH_5070085_DEFAULT_PROFILE':
 						case 'BATCH_5070167_DEFAULT_PROFILE':
+						case 'BATCH_5070231_DEFAULT_PROFILE':
 							tagArray[i] = 'BATCH_tagsize_2';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_mV_L2_R1_T6';
@@ -4291,6 +4297,7 @@ function decodeBatch(encoded, dataMessage) {
 							break;
 						case 'BATCH_5070085_DEFAULT_PROFILE_BATTERY_V':
 						case 'BATCH_5070167_DEFAULT_PROFILE_BATTERY_V':
+						case 'BATCH_5070231_DEFAULT_PROFILE_BATTERY_V':
 							tagArray[i] = 'BATCH_tagsize_2';
 							tagArray[tagArrayLength++] = 'BATCH_temperatures_°C_L0_R10_T7_D100';
 							tagArray[tagArrayLength++] = 'BATCH_batteryLevels_V_L2_R1_T6_D1000';
